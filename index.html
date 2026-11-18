@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Il était une fois… nous — Votre histoire en bande dessinée</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Caveat:wght@600&family=Comic+Neue:wght@400;700&family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,800;1,9..144,500&family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<style>
+:root{--ink:#1d1a24;--mut:#6d6577;--bg:#fbf6ef;--card:#fff;--red:#c0392b;--red2:#e5533d;--gold:#d9a441;--green:#1f6f50;--line:#ece3d6;--sel:#fff3df}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:16px}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;margin:0 0 10px}
+h1{font-size:clamp(32px,5vw,58px);line-height:1.05;font-weight:800}
+h2{font-size:30px;font-weight:800}h3{font-size:20px}
+a{color:inherit}
+button{font:inherit;cursor:pointer;border:0;border-radius:999px;padding:12px 22px;font-weight:600;background:#efe6d8;color:var(--ink);transition:transform .1s,box-shadow .2s}
+button:hover{transform:translateY(-1px)}button:active{transform:scale(.97)}
+button.pri{background:var(--red);color:#fff;box-shadow:0 6px 18px #c0392b44}
+button.pri:hover{background:var(--red2)}
+button.ghost{background:transparent;border:2px solid var(--line)}
+button.sm{padding:7px 14px;font-size:14px}
+button:disabled{opacity:.4;cursor:not-allowed;transform:none}
+input,textarea,select{font:inherit;width:100%;padding:11px 13px;border:2px solid var(--line);border-radius:12px;background:#fff;color:var(--ink)}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold)}
+textarea{resize:vertical;min-height:62px}
+label{font-weight:600;font-size:14px;display:block;margin:12px 0 6px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+.mut{color:var(--mut)}
+.card{background:var(--card);border-radius:22px;padding:22px;box-shadow:0 4px 24px #3b2a1a0f;border:1px solid var(--line)}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.g5{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+/* header */
+header{position:sticky;top:0;z-index:20;background:#fbf6efee;backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;gap:18px;height:66px}
+.logo{font-family:Fraunces,serif;font-weight:800;font-size:21px;cursor:pointer;white-space:nowrap}
+.logo i{font-family:Caveat,cursive;font-style:normal;color:var(--red);font-size:26px}
+.steps{display:flex;gap:4px;flex:1;justify-content:center;overflow-x:auto}
+.steps div{font-size:13px;padding:6px 11px;border-radius:999px;color:var(--mut);white-space:nowrap;cursor:pointer}
+.steps div.on{background:var(--ink);color:#fff}
+.steps div.ok{color:var(--green)}
+.steps div.ok::before{content:"✓ "}
+.demo-badge{font-size:12px;background:var(--gold);color:#fff;border-radius:999px;padding:4px 10px;font-weight:700}
+/* landing */
+.hero{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center;padding:56px 0 30px}
+@media(max-width:860px){.hero{grid-template-columns:1fr}.steps{display:none}}
+.hero p.lead{font-size:19px;line-height:1.55;color:#4a4252}
+.xmas{display:inline-block;background:#e9f4ee;color:var(--green);border-radius:999px;padding:6px 14px;font-weight:600;font-size:14px;margin-bottom:16px}
+.showcase{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;transform:rotate(-2deg)}
+.showcase .ph{aspect-ratio:3/4;border-radius:10px;background:#e8dfd2 center/cover;border:5px solid #fff;box-shadow:0 8px 24px #0002;position:relative;overflow:hidden}
+.showcase .ph span{position:absolute;bottom:6px;left:6px;background:#fff;border-radius:999px;font-size:11px;font-weight:700;padding:3px 8px}
+.how{padding:30px 0}
+.how .n{font-family:Bangers,cursive;font-size:44px;color:var(--red);line-height:1}
+.pricecard .p{font-family:Fraunces,serif;font-size:34px;font-weight:800}
+section{padding:26px 0}
+footer{padding:40px 0;color:var(--mut);font-size:14px;text-align:center}
+/* steps pages */
+.page-h{padding:30px 0 10px}
+.navbar{position:sticky;bottom:0;background:#fbf6efee;backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:14px 0;margin-top:30px;z-index:15}
+.navbar .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.drop{border:3px dashed #dccdb6;border-radius:22px;padding:36px;text-align:center;background:#fffaf3;cursor:pointer;transition:background .2s}
+.drop.over{background:var(--sel);border-color:var(--gold)}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-top:18px}
+.thumb{position:relative;border-radius:14px;overflow:hidden;background:#eee;aspect-ratio:4/3;box-shadow:0 2px 10px #0001}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb .n{position:absolute;top:6px;left:6px;background:#000a;color:#fff;border-radius:999px;font-size:12px;padding:2px 8px;font-weight:700}
+.thumb .ctl{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-between;padding:6px;background:linear-gradient(transparent,#000a)}
+.thumb .ctl button{padding:4px 9px;font-size:13px;background:#fffe}
+.thumb.cover{outline:4px solid var(--gold)}
+.opt{cursor:pointer;border:2px solid var(--line);transition:border-color .15s,background .15s;position:relative}
+.opt:hover{border-color:#e6cfa3}
+.opt.on{border-color:var(--red);background:var(--sel)}
+.opt.on::after{content:"✓";position:absolute;top:10px;right:12px;background:var(--red);color:#fff;border-radius:50%;width:24px;height:24px;display:grid;place-items:center;font-size:13px;font-weight:800}
+.opt .big{font-size:34px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chips button{background:#fff;border:2px solid var(--line);padding:8px 16px}
+.chips button.on{border-color:var(--red);background:var(--sel)}
+.prow{display:grid;grid-template-columns:150px 1fr;gap:16px;padding:16px 0;border-bottom:1px solid var(--line)}
+.prow:last-child{border:0}
+.prow img{width:150px;height:112px;object-fit:cover;border-radius:12px}
+@media(max-width:600px){.prow{grid-template-columns:1fr}.prow img{width:100%;height:180px}}
+.prow .two{display:grid;grid-template-columns:1fr 2fr;gap:10px}
+.prow .two2{display:grid;grid-template-columns:160px 1fr auto;gap:10px;align-items:center}
+@media(max-width:600px){.prow .two,.prow .two2{grid-template-columns:1fr}}
+.stylecard canvas{width:100%;border-radius:12px;display:block;background:#eee;aspect-ratio:4/3}
+.stylecard h3{margin:12px 0 4px}
+.viewer{display:grid;grid-template-columns:1fr 240px;gap:20px;align-items:start}
+@media(max-width:860px){.viewer{grid-template-columns:1fr}}
+.pagebox{background:#2a2530;border-radius:22px;padding:22px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.pagebox img{max-width:100%;max-height:78vh;box-shadow:0 12px 40px #0008;border-radius:4px;background:#fff}
+.pagebox .row{color:#fff}
+.pagebox button{background:#ffffff1f;color:#fff}
+.tstrip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:78vh;overflow:auto}
+@media(max-width:860px){.tstrip{grid-template-columns:repeat(6,1fr)}}
+.tstrip img{width:100%;border-radius:4px;cursor:pointer;border:3px solid transparent;display:block}
+.tstrip img.on{border-color:var(--red)}
+.progress{height:10px;border-radius:9px;background:#ffffff22;overflow:hidden;width:min(400px,80%)}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--red));width:0;transition:width .2s}
+.shop{display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start}
+@media(max-width:900px){.shop{grid-template-columns:1fr}}
+.summary{position:sticky;top:84px}
+.summary .l{display:flex;justify-content:space-between;padding:6px 0;font-size:15px}
+.summary .tot{font-family:Fraunces,serif;font-size:30px;font-weight:800;border-top:2px solid var(--line);margin-top:8px;padding-top:12px}
+.check{display:flex;gap:12px;align-items:flex-start;padding:12px;border:2px solid var(--line);border-radius:14px;cursor:pointer;margin-bottom:10px;background:#fff}
+.check.on{border-color:var(--red);background:var(--sel)}
+.check input{width:auto;margin-top:4px}
+.check .pr{margin-left:auto;font-weight:700;white-space:nowrap}
+.book3d{perspective:1200px;display:flex;justify-content:center;padding:20px 0}
+.book3d .b{width:210px;aspect-ratio:1240/1754;transform:rotateY(-28deg) rotateX(4deg);transform-style:preserve-3d;position:relative;box-shadow:24px 24px 40px #0004;border-radius:2px 6px 6px 2px;background:#ddd center/cover}
+.book3d .b::before{content:"";position:absolute;left:0;top:0;bottom:0;width:16px;transform-origin:left;transform:rotateY(90deg);background:linear-gradient(90deg,#222,#555)}
+.book3d .b::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#0000003a,#fff2 6%,#0000 12%);border-radius:inherit}
+.deadline{background:#e9f4ee;color:var(--green);border-radius:14px;padding:12px 14px;font-weight:600;margin-bottom:14px}
+.modal{position:fixed;inset:0;background:#1d1a24aa;display:flex;align-items:center;justify-content:center;z-index:60;padding:16px}
+.modal .card{width:100%;max-width:520px;max-height:92vh;overflow:auto}
+#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:99;max-width:92%;text-align:center}
+#toast.show{opacity:1}
+.note{background:#fff8e6;border:1px solid #f0dca8;border-radius:14px;padding:12px 14px;font-size:14px;color:#6b5420}
+.pill{display:inline-block;border-radius:999px;background:#efe6d8;padding:3px 10px;font-size:12px;font-weight:700}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="logo" onclick="go('home')">Il était une fois… <i>nous</i></div><div class="steps" id="steps"></div><span class="demo-badge">DÉMO</span></div></header>
+<main id="app"></main>
+<div id="toast"></div>
+<script>
+/* =====================================================================
+   IL ÉTAIT UNE FOIS… NOUS — démo d'un service BtoC de BD personnalisée
+   Tout tourne dans le navigateur : aucune photo n'est envoyée nulle part.
+   ===================================================================== */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const tick=()=>new Promise(r=>setTimeout(r,0));
+function toast(m,ms=2600){const t=$("#toast");t.innerHTML=m;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),ms)}
+const eur=n=>n.toFixed(2).replace(".",",")+" €";
+
+/* ============================== DONNÉES ============================== */
+const STEPS=[["photos","1. Photos"],["histoire","2. Histoire"],["style","3. Style"],["longueur","4. Longueur"],["apercu","5. Aperçu"],["commande","6. Impression & cadeau"]];
+const TYPES=[
+ {id:"couple",em:"💞",t:"Notre couple",d:"Votre rencontre, vos aventures, votre amour."},
+ {id:"famille",em:"👨‍👩‍👧",t:"Notre famille",d:"La saga de votre tribu, des débuts à aujourd'hui."},
+ {id:"voyage",em:"🧭",t:"Un voyage",d:"Un road-trip, des vacances inoubliables."},
+ {id:"hommage",em:"🎂",t:"Un hommage",d:"La vie d'un proche : anniversaire, retraite, fête des pères…"}];
+const TONES=[["tendre","🥰 Tendre"],["humour","😂 Humour"],["epique","⚔️ Épique"]];
+const OCCASIONS=["Noël","Saint-Valentin","Anniversaire","Anniversaire de mariage","Fête des mères","Fête des pères","Juste pour le plaisir"];
+const STYLES=[
+ {id:"anim",t:"Animation",em:"🎬",d:"Couleurs franches, ombres en aplats et contours nets, comme un dessin animé.",
+  page:"#fff",frame:"#1b1b1b",capBg:"#fff3b0",capFg:"#1b1b1b",capFont:"700 {s}px 'Comic Neue', 'Comic Sans MS', cursive",bubFont:"700 {s}px 'Comic Neue', 'Comic Sans MS', cursive",titleFont:"{s}px Bangers, Impact, sans-serif",card:"#ffd23f",cardFg:"#1b1b1b"},
+ {id:"manga",t:"Manga",em:"🌸",d:"Noir et blanc, trames de points et encrage, comme dans un manga japonais.",
+  page:"#fff",frame:"#111",capBg:"#fff",capFg:"#111",capFont:"700 {s}px 'Comic Neue', 'Comic Sans MS', cursive",bubFont:"700 {s}px 'Comic Neue', 'Comic Sans MS', cursive",titleFont:"{s}px Bangers, Impact, sans-serif",card:"#111",cardFg:"#fff"},
+ {id:"pop",t:"Comics pop art",em:"💥",d:"Couleurs vives, points de trame et gros traits, façon comics américain.",
+  page:"#fffdf5",frame:"#111",capBg:"#ffe14d",capFg:"#111",capFont:"700 {s}px 'Comic Neue', 'Comic Sans MS', cursive",bubFont:"700 {s}px 'Comic Neue', 'Comic Sans MS', cursive",titleFont:"{s}px Bangers, Impact, sans-serif",card:"#e63946",cardFg:"#fff"},
+ {id:"aqua",t:"Aquarelle",em:"🎨",d:"Lavis doux, papier texturé et crayonné léger, façon carnet de voyage.",
+  page:"#fbf7ee",frame:"#6b5d52",capBg:"#fffaf0",capFg:"#4a3f38",capFont:"italic 500 {s}px Fraunces, Georgia, serif",bubFont:"600 {s}px Caveat, cursive",titleFont:"italic 800 {s}px Fraunces, Georgia, serif",card:"#e9dcc7",cardFg:"#4a3f38",bubScale:1.25},
+ {id:"cine",t:"Photo-réaliste ciné",em:"🎞️",d:"Vos photos gardées réalistes, avec un étalonnage de cinéma, façon roman graphique.",
+  page:"#141414",frame:"#141414",capBg:"rgba(0,0,0,.78)",capFg:"#f5f0e6",capFont:"italic 500 {s}px Fraunces, Georgia, serif",bubFont:"600 {s}px Inter, sans-serif",titleFont:"800 {s}px Fraunces, Georgia, serif",card:"#1f1f1f",cardFg:"#f0e6d2",pageNum:"#888"}];
+const LENGTHS=[
+ {id:"courte",t:"Histoire courte",pages:4,add:0,d:"4 planches · l'essentiel en quelques cases",read:"3 min"},
+ {id:"classique",t:"Classique",pages:8,add:10,d:"8 planches · le format idéal pour offrir",read:"6 min",reco:1},
+ {id:"album",t:"Album",pages:12,add:20,d:"12 planches · une vraie BD avec chapitres",read:"10 min"},
+ {id:"grand",t:"Grand album",pages:16,add:30,d:"16 planches · la saga complète",read:"15 min"}];
+const FORMATS=[
+ {id:"pdf",em:"📱",t:"BD numérique",p:19,d:"PDF haute définition + lien de partage. Livré immédiatement.",ship:false},
+ {id:"souple",em:"📖",t:"Album souple A4",p:34,d:"Couverture souple, papier satiné 170 g, impression française."},
+ {id:"cartonne",em:"📕",t:"Album cartonné premium",p:49,d:"Couverture rigide pelliculée mate, papier 200 g. Le best-seller.",best:1},
+ {id:"coffret",em:"🎁",t:"Coffret cadeau Noël",p:79,d:"Album cartonné + poster A3 de la couverture + carte de vœux BD, dans un coffret prêt à offrir."}];
+const EXTRAS=[
+ {id:"emballage",t:"🎀 Emballage cadeau",d:"Papier kraft, ruban rouge et étiquette.",p:6,print:1},
+ {id:"carte",t:"✍️ Carte avec votre message",d:"Écrite à la main et glissée dans le colis.",p:4,print:1},
+ {id:"poster",t:"🖼️ Poster A3 de la couverture",d:"Papier d'art 250 g.",p:19,print:1,notIn:"coffret"},
+ {id:"mug",t:"☕ Mug avec la couverture",d:"Céramique, passe au lave-vaisselle.",p:15,print:1},
+ {id:"pdfplus",t:"📱 Version numérique en plus",d:"Le PDF HD pour la partager avec toute la famille.",p:5,print:1}];
+const SHIPPING=[{id:"std",t:"Standard (5 à 7 jours ouvrés)",p:4.9,days:7},{id:"exp",t:"Express (48 h)",p:9.9,days:2}];
+
+/* ----- textes générés (la vraie version utilisera une IA d'écriture) ----- */
+const CAPS={
+ couple:{debut:["Tout a commencé un jour comme les autres… ou presque.","{A} ne le savait pas encore, mais sa vie allait basculer.","Le premier regard. Le premier sourire. Le début de tout.","Il y a des rencontres qui ne doivent rien au hasard.","Ce jour-là, {A} et {B} se sont trouvés."],
+  milieu:["Les jours sont devenus des semaines, puis des années.","Ensemble, même les petits riens devenaient des aventures.","{B} avait le don de transformer chaque instant en souvenir.","On a ri. Beaucoup. Parfois même sans raison.","Main dans la main, on a découvert le monde… et nous-mêmes.","Il y a eu des tempêtes, mais toujours un arc-en-ciel après.","Notre recette secrète ? Un peu de folie et beaucoup de tendresse."],
+  fin:["Et l'histoire continue… page après page.","Le plus beau chapitre ? Celui qu'on écrira demain.","Ensemble. Aujourd'hui, demain et toujours."]},
+ famille:{debut:["Il était une fois une famille pas tout à fait comme les autres…","Au commencement, il y avait {A} et {B}. Puis la maison s'est remplie de rires.","Chaque famille a son histoire. Voici la nôtre."],
+  milieu:["Les dimanches à rallonge, les fous rires à table…","{C} grandissait à toute vitesse. Beaucoup trop vite !","Les vacances : le moment préféré de tout le monde (sauf de la voiture).","Ici, on partage tout : les crêpes, les bêtises et les câlins.","Les années passent, les souvenirs restent.","Chez nous, il y a toujours une place de plus à table."],
+  fin:["Et la plus belle aventure, c'est d'être ensemble.","À suivre… car une famille, ça s'écrit chaque jour.","Merci d'être nos héros du quotidien."]},
+ voyage:{debut:["Les valises étaient prêtes. L'aventure pouvait commencer.","Destination : l'inconnu. Équipage : {tous}.","Le grand départ ! (Après avoir vérifié trois fois les passeports.)"],
+  milieu:["Chaque matin, un nouveau paysage, une nouvelle surprise.","On s'est perdus… et c'était le meilleur moment du voyage.","Des kilomètres au compteur, des étoiles plein les yeux.","Ici, le temps semblait s'être arrêté.","La découverte du jour : un endroit que même les guides ignorent.","Les cartes postales n'auraient jamais suffi à raconter ça."],
+  fin:["On est rentrés… mais une partie de nous est restée là-bas.","Le prochain voyage ? Il est déjà dans nos têtes.","Fin du voyage. Début des souvenirs."]},
+ hommage:{debut:["Cette histoire est celle de {A}. Un héros, un vrai.","Avant d'être {A} pour nous, il y avait un enfant plein de rêves.","Tout le monde connaît {A}. Mais connaissez-vous toute son histoire ?"],
+  milieu:["Toujours là quand il le fallait. Toujours.","Son rire ? On l'entend encore d'une pièce à l'autre.","Une vie remplie de passions, d'amis et de bons petits plats.","{A} nous a appris l'essentiel : profiter de chaque instant.","Les années passent, mais l'énergie de {A} reste intacte !","Ses conseils, on les garde précieusement."],
+  fin:["Joyeux {occasion}, {A}. Cette BD, c'est notre façon de te dire merci.","Et ce n'est que le début de la suite…","Avec tout notre amour."]}};
+const BUBS={tendre:["Je t'aime, tu sais.","Promets-moi qu'on reviendra ici.","Tu es mon endroit préféré.","Regarde comme c'est beau…","Reste encore un peu.","Je n'oublierai jamais ce moment.","Merci d'être là.","Avec toi, tout est plus simple."],
+ humour:["Tu es SÛR que c'est par là ?","Souris ! Non, pas comme ça…","Qui a mangé le dernier croissant ?!","Je ne suis pas perdu, j'explore !","On aurait dû prendre un parapluie…","C'est la dernière photo, promis !","Je t'avais dit que c'était une bonne idée !","Encore cinq minutes…"],
+ epique:["En avant, l'aventure nous attend !","Rien ne pourra nous arrêter !","Ce jour restera dans la légende.","Ensemble, on est invincibles !","Regarde… c'est le début de quelque chose.","Pas de retour en arrière !","Le monde est à nous !","Prêts ? Partez !"]};
+const CHAPS={tendre:["Quelque temps plus tard…","Un jour d'été…","Et puis…","Les saisons ont passé…","Ce soir-là…","Un peu plus tard…"],
+ humour:["Pendant ce temps…","Quelques péripéties plus tard…","Attention, moment culte !","Ce qui devait arriver arriva…","Plus tard (beaucoup plus tard)…","Pendant ce temps, au QG…"],
+ epique:["Chapitre suivant : l'aventure !","Pendant ce temps, ailleurs…","Le destin était en marche…","Quelques années plus tard…","Le grand jour arriva enfin…","Mais l'aventure ne faisait que commencer…"]};
+const SILENT=["…","Un instant suspendu.","Rien d'autre ne comptait.","Clic !","Le temps s'arrête."];
+const TITLES={couple:["L'histoire de {A} & {B}","Nous deux","Notre plus belle aventure"],famille:["Notre tribu","La grande saga familiale","Les aventures de {tous}"],voyage:["Le voyage de {tous}","Carnet d'aventures","Au bout du monde"],hommage:["La vie extraordinaire de {A}","{A}, notre héros","Il était une fois {A}"]};
+
+/* ============================== ÉTAT ============================== */
+const ST={step:"home",photos:[],coverIdx:0,story:{type:"couple",heroes:["",""],tone:"tendre",occasion:"Noël",title:"",dedicace:""},
+ style:"anim",length:"classique",seed:1,pages:[],pageIdx:0,rendering:false,dirty:true,
+ order:{format:"cartonne",qty:1,extras:{},ship:"std"}};
+let PID=1;
+
+/* ============================== MOTEUR DE DESSIN ============================== */
+function chans(id){const n=id.width*id.height,d=id.data,R=new Float32Array(n),G=new Float32Array(n),B=new Float32Array(n);for(let i=0,j=0;i<n;i++,j+=4){R[i]=d[j];G[i]=d[j+1];B[i]=d[j+2]}return[R,G,B]}
+function blurCh(a,w,h,r){r=Math.round(r);if(r<1)return a;const k=2*r+1,t=new Float32Array(a.length),o=new Float32Array(a.length);
+ for(let y=0;y<h;y++){const row=y*w;let s=0;for(let i=-r;i<=r;i++)s+=a[row+Math.min(w-1,Math.max(0,i))];for(let x=0;x<w;x++){t[row+x]=s/k;s+=a[row+Math.min(w-1,x+r+1)]-a[row+Math.max(0,x-r)]}}
+ for(let x=0;x<w;x++){let s=0;for(let i=-r;i<=r;i++)s+=t[Math.min(h-1,Math.max(0,i))*w+x];for(let y=0;y<h;y++){o[y*w+x]=s/k;s+=t[Math.min(h-1,y+r+1)*w+x]-t[Math.max(0,y-r)*w+x]}}
+ return o}
+const gauss=(a,w,h,r)=>blurCh(blurCh(a,w,h,r),w,h,r);
+function lumOf(R,G,B){const L=new Float32Array(R.length);for(let i=0;i<L.length;i++)L[i]=.299*R[i]+.587*G[i]+.114*B[i];return L}
+function sobel(L,w,h){const M=new Float32Array(L.length);for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){const i=y*w+x;
+ const gx=-L[i-w-1]-2*L[i-1]-L[i+w-1]+L[i-w+1]+2*L[i+1]+L[i+w+1],gy=-L[i-w-1]-2*L[i-w]-L[i-w+1]+L[i+w-1]+2*L[i+w]+L[i+w+1];M[i]=Math.sqrt(gx*gx+gy*gy)}return M}
+function pct(M,p){const s=[];for(let i=0;i<M.length;i+=7)s.push(M[i]);s.sort((a,b)=>a-b);return s[Math.floor(p*(s.length-1))]||1}
+function edgeA(M,thr,soft){const A=new Float32Array(M.length),k=1/(thr*soft);for(let i=0;i<M.length;i++){const v=(M[i]-thr)*k;A[i]=v<0?0:v>1?1:v}return A}
+function dilate(A,w,h){const O=new Float32Array(A.length);for(let y=0;y<h;y++)for(let x=0;x<w;x++){let m=A[y*w+x];
+ if(x>0&&A[y*w+x-1]>m)m=A[y*w+x-1];if(x<w-1&&A[y*w+x+1]>m)m=A[y*w+x+1];if(y>0&&A[(y-1)*w+x]>m)m=A[(y-1)*w+x];if(y<h-1&&A[(y+1)*w+x]>m)m=A[(y+1)*w+x];O[y*w+x]=m}return O}
+function inkEdges(R,G,B,w,h,p,soft,thick){let L=gauss(lumOf(R,G,B),w,h,Math.max(1,Math.round(w/420)));let A=edgeA(sobel(L,w,h),pct(sobel(L,w,h),p),soft);for(let i=0;i<thick;i++)A=dilate(A,w,h);return A}
+function halftone(x,y,cell,cov){if(cov<=0)return 0;const u=(x+y)*.7071/cell,v=(x-y)*.7071/cell,fu=u-Math.floor(u)-.5,fv=v-Math.floor(v)-.5,d=Math.sqrt(fu*fu+fv*fv),r=Math.sqrt(Math.min(cov,1)/Math.PI)*1.08;const a=(r-d)*cell;return a<0?0:a>1?1:a}
+function valueNoise(w,h,cell,seed){const gw=Math.ceil(w/cell)+2,gh=Math.ceil(h/cell)+2,g=new Float32Array(gw*gh);let s=seed||7;for(let i=0;i<g.length;i++){s=(s*16807)%2147483647;g[i]=s/2147483647*2-1}
+ const N=new Float32Array(w*h);for(let y=0;y<h;y++){const gy=y/cell,y0=Math.floor(gy),fy=gy-y0;for(let x=0;x<w;x++){const gx=x/cell,x0=Math.floor(gx),fx=gx-x0,i=y0*gw+x0;
+ const a=g[i]+(g[i+1]-g[i])*fx,b=g[i+gw]+(g[i+gw+1]-g[i+gw])*fx;N[y*w+x]=a+(b-a)*fy}}return N}
+const clamp=v=>v<0?0:v>255?255:v;
+
+const FX={
+ anim(R,G,B,w,h){const r=Math.max(1,Math.round(w/260));const Rs=gauss(gauss(R,w,h,r),w,h,r),Gs=gauss(gauss(G,w,h,r),w,h,r),Bs=gauss(gauss(B,w,h,r),w,h,r);
+  const L=lumOf(Rs,Gs,Bs),A=inkEdges(R,G,B,w,h,.9,.7,w>650?2:1),O=new Uint8ClampedArray(w*h*4),lv=5;
+  for(let i=0,j=0;i<L.length;i++,j+=4){const l=L[i],q=(Math.min(lv-1,Math.floor(l/256*lv))+.5)/lv*255,f=(0.72*q+0.28*l+10)/(l+1);
+   let r_=Rs[i]*f,g_=Gs[i]*f,b_=Bs[i]*f;const gl=.299*r_+.587*g_+.114*b_;r_=gl+(r_-gl)*1.4;g_=gl+(g_-gl)*1.4;b_=gl+(b_-gl)*1.4;const a=A[i];
+   O[j]=clamp(r_*(1-a)+28*a);O[j+1]=clamp(g_*(1-a)+24*a);O[j+2]=clamp(b_*(1-a)+30*a);O[j+3]=255}return O},
+ manga(R,G,B,w,h){let L=gauss(lumOf(R,G,B),w,h,1);const lo=pct(L,.03),hi=pct(L,.97),A=inkEdges(R,G,B,w,h,.87,.6,w>650?1:0),O=new Uint8ClampedArray(w*h*4),cell=Math.max(5,w/105);
+  for(let y=0,i=0;y<h;y++)for(let x=0;x<w;x++,i++){let v=(L[i]-lo)/(hi-lo+1)*255;let o;
+   if(v>205)o=252;else if(v<48)o=20;else{const cov=Math.pow((205-v)/157,1.1);const a=halftone(x,y,cell,cov);o=252*(1-a)+22*a}
+   const a=A[i];o=o*(1-a)+14*a;const j=i*4;O[j]=o;O[j+1]=o-1;O[j+2]=o-5;O[j+3]=255}return O},
+ pop(R,G,B,w,h){const r=Math.max(1,Math.round(w/420));const Rs=gauss(R,w,h,r),Gs=gauss(G,w,h,r),Bs=gauss(B,w,h,r);const A=inkEdges(R,G,B,w,h,.88,.6,w>650?2:1),O=new Uint8ClampedArray(w*h*4),cell=Math.max(6,w/80);
+  for(let y=0,i=0;y<h;y++)for(let x=0;x<w;x++,i++){let r_=Rs[i],g_=Gs[i],b_=Bs[i];const gl=.299*r_+.587*g_+.114*b_;r_=gl+(r_-gl)*1.9;g_=gl+(g_-gl)*1.9;b_=gl+(b_-gl)*1.9;
+   r_=Math.round(clamp(r_)/255*3)*85;g_=Math.round(clamp(g_)/255*3)*85;b_=Math.round(clamp(b_)/255*3)*85;
+   const cov=Math.max(0,(175-gl)/175)*.85,d=halftone(x,y,cell,cov)*.62;r_*=1-d;g_*=1-d;b_*=1-d;
+   if(gl>150){const hd=halftone(x+cell/2,y,cell,(gl-150)/105*.35)*.18;b_=b_*(1-hd);g_=g_*(1-hd*.4)}
+   const a=A[i],j=i*4;O[j]=clamp(r_*(1-a)+12*a);O[j+1]=clamp(g_*(1-a)+12*a);O[j+2]=clamp(b_*(1-a)+16*a);O[j+3]=255}return O},
+ aqua(R,G,B,w,h){const r=Math.max(1,Math.round(w/320));const Rs=gauss(gauss(R,w,h,r),w,h,r),Gs=gauss(gauss(G,w,h,r),w,h,r),Bs=gauss(gauss(B,w,h,r),w,h,r);
+  const L=lumOf(Rs,Gs,Bs),L2=gauss(L,w,h,r*3),N=valueNoise(w,h,Math.max(14,w/40),11),N2=valueNoise(w,h,Math.max(40,w/8),5);
+  const A=inkEdges(R,G,B,w,h,.9,.8,0),O=new Uint8ClampedArray(w*h*4),lv=7,m=Math.min(w,h)*.045;
+  for(let y=0,i=0;y<h;y++)for(let x=0;x<w;x++,i++){const l=L[i],q=(Math.min(lv-1,Math.floor(l/256*lv))+.5)/lv*255,f=(.5*q+.5*l)/(l+1);
+   let r_=Rs[i]*f,g_=Gs[i]*f,b_=Bs[i]*f;const gl=.299*r_+.587*g_+.114*b_;r_=gl+(r_-gl)*1.2;g_=gl+(g_-gl)*1.2;b_=gl+(b_-gl)*1.2;
+   const pool=1-Math.min(.22,Math.abs(l-L2[i])/255*1.3),tex=1+N[i]*.05+(Math.random()-.5)*.03;
+   r_=(r_*.88+255*.12)*pool*tex;g_=(g_*.88+250*.12)*pool*tex;b_=(b_*.88+238*.12)*pool*tex;
+   const bd=Math.min(x,y,w-1-x,h-1-y)/m+N2[i]*.35;if(bd<1){const k=Math.max(0,bd);r_=r_*k+251*(1-k);g_=g_*k+247*(1-k);b_=b_*k+238*(1-k)}
+   const a=A[i]*.5,j=i*4;O[j]=clamp(r_*(1-a)+70*a);O[j+1]=clamp(g_*(1-a)+60*a);O[j+2]=clamp(b_*(1-a)+55*a);O[j+3]=255}return O},
+ cine(R,G,B,w,h){const O=new Uint8ClampedArray(w*h*4),y0=1/(1+Math.exp(3)),y1=1/(1+Math.exp(-3)),curve=v=>{const x=v/255,c=(1/(1+Math.exp(-6*(x-.5)))-y0)/(y1-y0);return(.62*c+.38*x)*255};
+  for(let y=0,i=0;y<h;y++)for(let x=0;x<w;x++,i++){let r_=curve(R[i]),g_=curve(G[i]),b_=curve(B[i]);const l=(.299*r_+.587*g_+.114*b_)/255,s=(1-l)*(1-l),hh=l*l;
+   r_+=-12*s+20*hh;g_+=3*s+6*hh;b_+=16*s-16*hh;const gl=.299*r_+.587*g_+.114*b_;r_=gl+(r_-gl)*1.08;g_=gl+(g_-gl)*1.08;b_=gl+(b_-gl)*1.08;
+   const dx=x/w-.5,dy=y/h-.5,v=1-.9*(dx*dx+dy*dy),gr=(Math.random()-.5)*12,j=i*4;O[j]=clamp(r_*v+gr);O[j+1]=clamp(g_*v+gr);O[j+2]=clamp(b_*v+gr);O[j+3]=255}return O}};
+
+/* découpe "cover" d'une photo dans un cadre w×h (zoom + centre) */
+function cropTo(src,w,h,zoom=1,cx=.5,cy=.45){const c=document.createElement("canvas");c.width=w;c.height=h;const ctx=c.getContext("2d");
+ const iw=src.width,ih=src.height,a=w/h;let sw=Math.min(iw,ih*a)/zoom,sh=sw/a;let sx=Math.min(Math.max(cx*iw-sw/2,0),iw-sw),sy=Math.min(Math.max(cy*ih-sh/2,0),ih-sh);
+ ctx.imageSmoothingQuality="high";ctx.drawImage(src,sx,sy,sw,sh,0,0,w,h);return c}
+const CACHE=new Map();
+function stylize(photo,style,w,h,zoom,cx,cy){w=Math.round(w);h=Math.round(h);const key=[photo.id,style,w,h,zoom,cx,cy].join("|");if(CACHE.has(key))return CACHE.get(key);
+ const c=cropTo(photo.src,w,h,zoom,cx,cy),ctx=c.getContext("2d"),id=ctx.getImageData(0,0,w,h),[R,G,B]=chans(id);id.data.set(FX[style](R,G,B,w,h));ctx.putImageData(id,0,0);
+ if(CACHE.size>220)CACHE.delete(CACHE.keys().next().value);CACHE.set(key,c);return c}
+
+/* ============================== TEXTE & BULLES ============================== */
+const F=(tpl,s)=>tpl.replace("{s}",Math.round(s));
+function wrap(ctx,text,maxW){const out=[];String(text).split("\n").forEach(par=>{let line="";par.split(/\s+/).forEach(w=>{const t=line?line+" "+w:w;if(ctx.measureText(t).width>maxW&&line){out.push(line);line=w}else line=t});out.push(line)});return out}
+function heroes(){const h=ST.story.heroes.map(x=>x.trim()).filter(Boolean);return h.length?h:["Elle","Lui"]}
+function fill(t){const h=heroes();const tous=h.length==1?h[0]:h.slice(0,-1).join(", ")+" & "+h[h.length-1];
+ return String(t).replace(/\{A\}/g,h[0]).replace(/\{B\}/g,h[1]||h[0]).replace(/\{C\}/g,h[2]||h[1]||h[0]).replace(/\{tous\}/g,tous).replace(/\{occasion\}/g,ST.story.occasion.toLowerCase())}
+function rng(seed){let s=seed*9301+49297;return()=>{s=(s*9301+49297)%233280;return s/233280}}
+
+function drawCaption(ctx,S,x,y,maxW,when,text,fs){const parts=[];ctx.font=F(S.capFont,fs);const lines=text?wrap(ctx,text,maxW-2*fs*.6):[];
+ const lh=fs*1.22,pad=fs*.55;let wl=[];if(when){ctx.font=F(S.capFont.replace(/^(italic )?\d+ /,"italic 600 "),fs*.82);wl=wrap(ctx,when,maxW-2*pad)}
+ ctx.font=F(S.capFont,fs);let bw=0;lines.forEach(l=>bw=Math.max(bw,ctx.measureText(l).width));ctx.font=F(S.capFont.replace(/^(italic )?\d+ /,"italic 600 "),fs*.82);wl.forEach(l=>bw=Math.max(bw,ctx.measureText(l).width));
+ bw+=2*pad;const bh=pad*2+lines.length*lh+wl.length*lh*.85;ctx.fillStyle=S.capBg;ctx.fillRect(x,y,bw,bh);if(S.id!="cine"){ctx.lineWidth=3;ctx.strokeStyle=S.frame;ctx.strokeRect(x,y,bw,bh)}
+ ctx.fillStyle=S.capFg;ctx.textBaseline="top";let yy=y+pad;ctx.globalAlpha=.75;wl.forEach(l=>{ctx.fillText(l,x+pad,yy);yy+=lh*.85});ctx.globalAlpha=1;ctx.font=F(S.capFont,fs);lines.forEach(l=>{ctx.fillText(l,x+pad,yy);yy+=lh});return bh}
+function drawBubble(ctx,S,px,py,pw,ph,text,side,fs){fs*=S.bubScale||1;ctx.font=F(S.bubFont,fs);const lines=wrap(ctx,text,pw*.5);const lh=fs*1.18;let tw=0;lines.forEach(l=>tw=Math.max(tw,ctx.measureText(l).width));
+ const rx=Math.min(pw*.46,tw/2*1.25+fs*.6),ry=lines.length*lh/2*1.28+fs*.5;const m=pw*.05;
+ const cx=side?px+pw-m-rx:px+m+rx,cy=py+ph-Math.max(ph*.2,ry*2+ph*.05)+ry*.1;
+ const tx=cx+(side?-1:1)*rx*.35,ty=Math.min(py+ph-6,cy+ry+Math.max(28,ph*.12));
+ ctx.lineJoin="round";ctx.lineWidth=S.id=="cine"?3:6;ctx.strokeStyle=S.id=="cine"?"#000":S.frame;ctx.fillStyle="#fff";
+ const tail=()=>{ctx.beginPath();ctx.moveTo(cx+(side?-1:1)*rx*.05,cy+ry*.6);ctx.quadraticCurveTo(cx+(side?-1:1)*rx*.15,cy+ry*1.1,tx,ty);ctx.quadraticCurveTo(cx+(side?-1:1)*rx*.3,cy+ry*.9,cx+(side?-1:1)*rx*.4,cy+ry*.5);ctx.closePath()};
+ const ell=()=>{ctx.beginPath();ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2)};
+ tail();ctx.stroke();ell();ctx.stroke();tail();ctx.fill();ell();ctx.fill();
+ ctx.fillStyle="#141414";ctx.textAlign="center";ctx.textBaseline="middle";lines.forEach((l,k)=>ctx.fillText(l,cx,cy+(k-(lines.length-1)/2)*lh));ctx.textAlign="left"}
+function textCard(ctx,S,x,y,w,h,text,big){ctx.fillStyle=S.card;ctx.fillRect(x,y,w,h);let fs=Math.min(h*.28,w*.11)*(big?1.4:1);ctx.font=F(S.titleFont,fs);let lines=wrap(ctx,text,w*.84);
+ while(lines.length*fs*1.1>h*.8&&fs>18){fs*=.9;ctx.font=F(S.titleFont,fs);lines=wrap(ctx,text,w*.84)}
+ ctx.fillStyle=S.cardFg;ctx.textAlign="center";ctx.textBaseline="middle";lines.forEach((l,k)=>ctx.fillText(l,x+w/2,y+h/2+(k-(lines.length-1)/2)*fs*1.1));ctx.textAlign="left"}
+function outlinedText(ctx,S,text,x,y,fs,maxW,color,stroke){ctx.font=F(S.titleFont,fs);let lines=wrap(ctx,text,maxW);while(lines.length>3&&fs>40){fs*=.9;ctx.font=F(S.titleFont,fs);lines=wrap(ctx,text,maxW)}
+ ctx.textAlign="center";ctx.textBaseline="top";ctx.lineJoin="round";lines.forEach((l,k)=>{const yy=y+k*fs*1.05;if(stroke){ctx.lineWidth=fs*.14;ctx.strokeStyle=stroke;ctx.strokeText(l,x,yy)}ctx.fillStyle=color;ctx.fillText(l,x,yy)});ctx.textAlign="left";return lines.length*fs*1.05}
+
+/* ============================== MISE EN PAGE ============================== */
+const PW=1240,PH=1754,MG=58,GT=22;
+const TPL={A:[[0,0,1,.55],[0,.55,.5,.45],[.5,.55,.5,.45]],B:[[0,0,.5,.45],[.5,0,.5,.45],[0,.45,1,.55]],C:[[0,0,1,.333],[0,.333,1,.334],[0,.667,1,.333]],
+ D:[[0,0,.5,.5],[.5,0,.5,.5],[0,.5,.5,.5],[.5,.5,.5,.5]],E:[[0,0,.58,1],[.58,0,.42,.5],[.58,.5,.42,.5]],F:[[0,0,1,.4],[0,.4,.42,.6],[.42,.4,.58,.6]],
+ G:[[0,0,.6,.34],[.6,0,.4,.34],[0,.34,1,.33],[0,.67,.4,.33],[.4,.67,.6,.33]],H:[[0,0,.5,.333],[.5,0,.5,.333],[0,.333,.5,.334],[.5,.333,.5,.334],[0,.667,.5,.333],[.5,.667,.5,.333]],
+ END:[[0,0,1,.72],[0,.72,1,.28]]};
+const DENSER={A:"D",B:"D",C:"D",E:"D",F:"D",D:"G",G:"H",H:"H"};
+function buildPlan(){const P=ST.photos,n=P.length,L=LENGTHS.find(l=>l.id==ST.length),N=L.pages,r=rng(ST.seed);
+ const pool=["A","B","C","D","E","F","B","A","E","D"];const tp=[];for(let i=0;i<N-1;i++)tp.push(i==0?"A":pool[Math.floor(r()*pool.length)]);
+ const need=Math.max(0,n-1);let tot=()=>tp.reduce((s,t)=>s+TPL[t].length,0);let guard=0;while(tot()<need&&guard++<100){let k=0;tp.forEach((t,i)=>{if(TPL[t].length<TPL[tp[k]].length)k=i});if(tp[k]=="H")break;tp[k]=DENSER[tp[k]]}
+ const slots=tot(),extra=Math.max(0,slots-need),nCh=Math.min(n>3?5:2,Math.floor(extra/4)),nCl=extra-nCh;
+ const tone=ST.story.tone,chs=CHAPS[tone];const seq=[];const closeSpots=[[.5,.38],[.32,.5],[.68,.5],[.5,.62]];
+ const per=[];for(let i=0;i<need;i++)per.push(0);for(let k=0;k<nCl;k++)per[k%Math.max(need,1)]++;
+ for(let i=0;i<need;i++){seq.push({kind:"photo",pi:i});for(let k=0;k<per[i];k++){const sp=closeSpots[(i+k)%4];seq.push({kind:"close",pi:i,zoom:1.6+0.25*(k%3),cx:sp[0],cy:sp[1],txt:r()<.3?SILENT[Math.floor(r()*SILENT.length)]:""})}}
+ for(let c=0;c<nCh;c++){const pos=Math.round((c+1)*seq.length/(nCh+1));let p=pos;while(p<seq.length&&seq[p].kind!="photo")p++;seq.splice(Math.max(1,p),0,{kind:"chap",txt:chs[(c+ST.seed)%chs.length]})}
+ while(seq.length<slots)seq.push({kind:"chap",txt:chs[seq.length%chs.length]});
+ const pages=[];let k=0;tp.forEach(t=>{pages.push({tpl:t,items:TPL[t].map(()=>seq[k++])})});pages.push({tpl:"END",items:[{kind:"photo",pi:n-1,last:1},{kind:"fin"}]});return pages}
+function panelRect(r){const ax=MG-GT/2,ay=MG-GT/2,aw=PW-2*MG+GT,ah=PH-2*MG-34+GT;return[ax+r[0]*aw+GT/2,ay+r[1]*ah+GT/2,r[2]*aw-GT,r[3]*ah-GT]}
+async function renderPage(pg,num){const S=STYLES.find(s=>s.id==ST.style),c=document.createElement("canvas");c.width=PW;c.height=PH;const ctx=c.getContext("2d");
+ ctx.fillStyle=S.page;ctx.fillRect(0,0,PW,PH);const sp=heroes();
+ for(let i=0;i<pg.items.length;i++){const it=pg.items[i];const [x,y,w,h]=panelRect(TPL[pg.tpl][i]);ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
+  const fs=Math.max(24,Math.min(36,w/19));
+  if(it.kind=="photo"||it.kind=="close"){const ph=ST.photos[it.pi];ctx.drawImage(stylize(ph,ST.style,w,h,it.zoom||1,it.cx||.5,it.cy||.45),x,y);await tick();
+   if(it.kind=="photo"){if(ph.when||ph.caption)drawCaption(ctx,S,x,y,Math.min(w*.72,560),ph.when,ph.caption,fs);if(ph.bubble)drawBubble(ctx,S,x,y,w,h,ph.bubble,ph.speaker%2==1,fs)}
+   else if(it.txt)drawCaption(ctx,S,x,y,w*.7,"",it.txt,fs)}
+  else if(it.kind=="chap")textCard(ctx,S,x,y,w,h,it.txt);
+  else if(it.kind=="fin"){ctx.fillStyle=S.card;ctx.fillRect(x,y,w,h);ctx.fillStyle=S.cardFg;ctx.font=F(S.titleFont,Math.min(110,h*.42));ctx.textAlign="center";ctx.textBaseline="top";ctx.fillText(S.id=="aqua"||S.id=="cine"?"Fin":"FIN",x+w/2,y+h*.08);
+   if(ST.story.dedicace){ctx.font="600 "+Math.round(Math.min(58,h*.17))+"px Caveat, cursive";const ls=wrap(ctx,ST.story.dedicace,w*.86);ls.slice(0,3).forEach((l,k)=>ctx.fillText(l,x+w/2,y+h*.52+k*h*.15))}ctx.textAlign="left"}
+  ctx.restore();ctx.lineWidth=S.id=="cine"?0:5;if(ctx.lineWidth){ctx.strokeStyle=S.frame;ctx.strokeRect(x,y,w,h)}}
+ ctx.fillStyle=S.pageNum||"#777";ctx.font="500 20px Inter, sans-serif";ctx.textAlign="center";ctx.fillText(String(num),PW/2,PH-36);ctx.textAlign="left";return c}
+async function renderCover(){const S=STYLES.find(s=>s.id==ST.style),c=document.createElement("canvas");c.width=PW;c.height=PH;const ctx=c.getContext("2d");
+ const ph=ST.photos[ST.coverIdx]||ST.photos[0];ctx.drawImage(stylize(ph,ST.style,PW,PH,1,.5,.45),0,0);await tick();
+ let g=ctx.createLinearGradient(0,0,0,PH*.42);g.addColorStop(0,"rgba(0,0,0,.6)");g.addColorStop(1,"rgba(0,0,0,0)");ctx.fillStyle=g;ctx.fillRect(0,0,PW,PH*.42);
+ g=ctx.createLinearGradient(0,PH*.72,0,PH);g.addColorStop(0,"rgba(0,0,0,0)");g.addColorStop(1,"rgba(0,0,0,.65)");ctx.fillStyle=g;ctx.fillRect(0,PH*.72,PW,PH*.28);
+ const title=fill(ST.story.title||TITLES[ST.story.type][0]);const pop=S.id=="pop"||S.id=="anim"||S.id=="manga";
+ const th=outlinedText(ctx,S,title,PW/2,110,pop?150:118,PW-160,pop?(S.id=="pop"?"#ffe14d":"#fff"):"#fff",pop?"#111":null);
+ ctx.font="600 46px Caveat, cursive";ctx.fillStyle="#fff";ctx.textAlign="center";ctx.fillText("Une histoire de "+fill("{tous}"),PW/2,140+th);
+ ctx.font="800 30px Inter, sans-serif";ctx.fillText(ST.story.occasion.toUpperCase()+" "+new Date().getFullYear(),PW/2,PH-150);
+ ctx.font="italic 600 26px Fraunces, Georgia, serif";ctx.globalAlpha=.85;ctx.fillText("Il était une fois… nous",PW/2,PH-100);ctx.globalAlpha=1;ctx.textAlign="left";
+ if(S.id=="pop"){ctx.save();ctx.translate(PW-170,PH*.5);ctx.rotate(-.2);ctx.fillStyle="#e63946";ctx.beginPath();for(let k=0;k<24;k++){const a=k/24*Math.PI*2,rr=k%2?95:130;ctx.lineTo(Math.cos(a)*rr,Math.sin(a)*rr)}ctx.closePath();ctx.fill();ctx.lineWidth=6;ctx.strokeStyle="#111";ctx.stroke();ctx.fillStyle="#fff";ctx.font="60px Bangers";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText("WOW!",0,0);ctx.restore()}
+ if(S.id=="manga"){ctx.save();ctx.fillStyle="#fff";ctx.fillRect(PW-120,PH*.3,64,330);ctx.strokeStyle="#111";ctx.lineWidth=4;ctx.strokeRect(PW-120,PH*.3,64,330);ctx.fillStyle="#111";ctx.font="44px Bangers";ctx.textAlign="center";"VOL.1".split("").forEach((ch,k)=>ctx.fillText(ch,PW-88,PH*.3+20+k*60));ctx.restore()}
+ return c}
+async function fontsReady(){try{await Promise.race([Promise.all(["60px Bangers","700 30px 'Comic Neue'","600 30px Caveat","italic 500 30px Fraunces","800 30px Fraunces","italic 600 30px Fraunces"].map(f=>document.fonts.load(f))),new Promise(r=>setTimeout(r,2500))])}catch(e){}}
+async function renderAll(){if(ST.rendering)return;ST.rendering=true;await fontsReady();const plan=buildPlan(),total=plan.length+1;ST.pages=[];ST.pageIdx=Math.min(ST.pageIdx,total-1);
+ const prog=p=>{const e=$("#prog i");if(e)e.style.width=Math.round(100*p/total)+"%";const t=$("#progt");if(t)t.textContent=`Dessin de la planche ${Math.min(p+1,total)} / ${total}…`};
+ try{prog(0);ST.pages.push((await renderCover()).toDataURL("image/jpeg",.88));if(ST.step=="apercu")drawViewer();
+  for(let i=0;i<plan.length;i++){prog(i+1);ST.pages.push((await renderPage(plan[i],i+1)).toDataURL("image/jpeg",.88));if(ST.step=="apercu")drawViewer();await tick()}
+  ST.dirty=false}catch(e){console.error(e);toast("Oups, erreur de dessin : "+e.message)}
+ ST.rendering=false;if(ST.step=="apercu")drawViewer()}
+
+/* ============================== NAVIGATION ============================== */
+function go(step){if(step=="apercu"&&!canGo("apercu"))return toast("Ajoutez au moins 5 photos pour voir votre BD.");ST.step=step;window.scrollTo(0,0);renderSteps();({home,photos,histoire,style:styleStep,longueur,apercu,commande,merci})[step]()}
+function canGo(s){return ST.photos.length>=5||["home","photos"].includes(s)}
+function renderSteps(){const i=STEPS.findIndex(s=>s[0]==ST.step);$("#steps").innerHTML=ST.step=="home"||ST.step=="merci"?"":STEPS.map((s,k)=>`<div class="${k==i?"on":k<i?"ok":""}" onclick="${canGo(s[0])?`go('${s[0]}')`:"toast('Ajoutez au moins 5 photos d\\'abord 📸')"}">${s[1]}</div>`).join("")}
+function navbar(prev,next,label,dis){return `<div class="navbar"><div class="wrap">${prev?`<button class="ghost" onclick="go('${prev}')">← Retour</button>`:"<span></span>"}<span class="mut" id="navinfo"></span><button class="pri" ${dis?"disabled":""} id="nextBtn" onclick="go('${next}')">${label} →</button></div></div>`}
+function markDirty(){ST.dirty=true}
+
+/* ---------- Accueil ---------- */
+function home(){const days=daysToXmas();
+ $("#app").innerHTML=`<div class="wrap"><div class="hero"><div>
+  <div class="xmas">🎄 ${days>0?`Plus que ${days} jours avant Noël · livraison garantie pour toute commande avant le 15 décembre`:"Le cadeau qui fait pleurer (de joie) toute la famille"}</div>
+  <h1>Votre histoire,<br>en bande dessinée.</h1>
+  <p class="lead">Envoyez 5 à 15 photos, racontez-nous votre histoire en quelques questions, choisissez un style de dessin… et recevez <b>une BD unique</b> dont vous êtes les héros. Le cadeau parfait pour un couple, une famille ou un proche qu'on aime.</p>
+  <div class="row" style="margin-top:22px"><button class="pri" style="font-size:18px;padding:16px 30px" onclick="go('photos')">Créer ma BD ✨</button><button class="ghost" onclick="startDemo()">Essayer avec un exemple</button></div>
+  <div class="mut" style="margin-top:14px;font-size:14px">⭐ 4,9/5 · Aperçu gratuit avant de payer · Imprimé en France</div></div>
+  <div class="showcase" id="showcase">${STYLES.slice(0,6).map(s=>`<div class="ph" data-style="${s.id}"><span>${s.em} ${s.t}</span></div>`).join("")}<div class="ph" style="background:#fff;display:grid;place-items:center;text-align:center;font-family:Bangers;font-size:26px;color:var(--red);padding:10px">5 styles<br>au choix !</div></div></div>
+  <section class="how"><h2>Comment ça marche ?</h2><div class="grid g5" style="margin-top:16px">
+   ${[["Vos photos","5 à 15 photos de vos plus beaux moments : rencontre, voyages, enfants, Noëls…"],["Votre histoire","On vous guide en quelques questions : vous écrivez les textes, ou on vous les suggère."],["Votre style","Animation, manga, comics, aquarelle ou réaliste : vos photos sont redessinées."],["Aperçu immédiat","Vous voyez toute votre BD avant de payer. Modifiez autant que vous voulez."],["Le cadeau","PDF instantané, album cartonné ou coffret cadeau livré avant Noël."]].map((x,k)=>`<div class="card"><div class="n">${k+1}</div><h3>${x[0]}</h3><div class="mut">${x[1]}</div></div>`).join("")}</div></section>
+  <section><h2>Les prix</h2><div class="grid g3" style="margin-top:16px">${FORMATS.map(f=>`<div class="card pricecard"><div style="font-size:30px">${f.em}</div><h3>${f.t}</h3><div class="p">dès ${f.p} €</div><div class="mut">${f.d}</div></div>`).join("")}</div></section>
+  <section><h2>Questions fréquentes</h2><div class="grid g2" style="margin-top:12px">
+   ${[["Et si mes photos ne sont pas parfaites ?","Pas de souci : des photos de téléphone suffisent. Évitez seulement les photos très floues ou très sombres."],["Puis-je voir la BD avant de payer ?","Oui ! L'aperçu complet est gratuit. Vous ne payez qu'une fois satisfait."],["Combien de temps pour la recevoir ?","Le PDF est immédiat. L'album est imprimé en 48 h puis livré en 2 à 7 jours selon l'option choisie."],["Mes photos sont-elles protégées ?","Vos photos ne servent qu'à votre BD et sont supprimées 30 jours après la livraison."]].map(q=>`<div class="card"><h3 style="font-size:17px">${q[0]}</h3><div class="mut">${q[1]}</div></div>`).join("")}</div></section></div>
+  <footer>Il était une fois… nous — site de démonstration · aucune commande réelle n'est passée.</footer>`;
+ showcase()}
+async function showcase(){try{const src=await loadURL("https://picsum.photos/id/129/600/800");const ph={id:"show",src};
+ document.querySelectorAll("#showcase .ph[data-style]").forEach(async (el,k)=>{await new Promise(r=>setTimeout(r,80*k));el.style.backgroundImage=`url(${stylize(ph,el.dataset.style,300,400,1,.5,.5).toDataURL("image/jpeg",.85)})`})}catch(e){}}
+function daysToXmas(){const n=new Date(),x=new Date(n.getFullYear(),11,25);return Math.ceil((x-n)/864e5)}
+
+/* ---------- 1. Photos ---------- */
+function photos(){const n=ST.photos.length;
+ $("#app").innerHTML=`<div class="wrap"><div class="page-h"><h2>📸 Vos photos</h2><div class="mut">Ajoutez de 5 à 15 photos, dans l'ordre de l'histoire. Les personnes doivent être bien visibles. La photo avec l'étoile ⭐ sera la couverture.</div></div>
+  <div class="drop" id="drop" onclick="$('#file').click()"><div style="font-size:44px">🖼️</div><h3>Glissez vos photos ici</h3><div class="mut">ou cliquez pour les choisir · JPG, PNG, HEIC converti · ${n}/15</div>
+   <input type="file" id="file" accept="image/*" multiple hidden onchange="addFiles(this.files)"></div>
+  <div class="row" style="margin-top:12px"><button class="sm ghost" onclick="loadSamples()">✨ Utiliser des photos d'exemple</button>${n?`<button class="sm ghost" onclick="if(confirm('Retirer toutes les photos ?')){ST.photos=[];markDirty();photos()}">🗑️ Tout retirer</button>`:""}</div>
+  <div class="thumbs">${ST.photos.map((p,i)=>`<div class="thumb ${i==ST.coverIdx?"cover":""}"><img src="${p.thumb}"><div class="n">${i+1}</div>
+   <div class="ctl"><button onclick="mv(${i},-1)" title="Avant">←</button><button onclick="ST.coverIdx=${i};markDirty();photos()" title="Couverture">${i==ST.coverIdx?"⭐":"☆"}</button><button onclick="rm(${i})" title="Retirer">✕</button><button onclick="mv(${i},1)" title="Après">→</button></div></div>`).join("")}</div>
+  </div>${navbar("home","histoire","Raconter l'histoire",n<5)}`;
+ $("#navinfo").textContent=n<5?`Encore ${5-n} photo${5-n>1?"s":""} minimum`:n>15?"Maximum 15 photos":`${n} photos ✓`;
+ const d=$("#drop");["dragenter","dragover"].forEach(e=>d.addEventListener(e,ev=>{ev.preventDefault();d.classList.add("over")}));["dragleave","drop"].forEach(e=>d.addEventListener(e,ev=>{ev.preventDefault();d.classList.remove("over")}));d.addEventListener("drop",ev=>addFiles(ev.dataTransfer.files))}
+function mv(i,d){const j=i+d;if(j<0||j>=ST.photos.length)return;const a=ST.photos;[a[i],a[j]]=[a[j],a[i]];if(ST.coverIdx==i)ST.coverIdx=j;else if(ST.coverIdx==j)ST.coverIdx=i;markDirty();photos()}
+function rm(i){ST.photos.splice(i,1);if(ST.coverIdx>=ST.photos.length)ST.coverIdx=0;markDirty();photos()}
+function toCanvas(img,max=1600){const k=Math.min(1,max/Math.max(img.width,img.height)),c=document.createElement("canvas");c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext("2d").drawImage(img,0,0,c.width,c.height);return c}
+function loadURL(url){return new Promise((res,rej)=>{const im=new Image();im.crossOrigin="anonymous";im.onload=()=>res(toCanvas(im));im.onerror=rej;im.src=url})}
+function newPhoto(src,extra){const t=toCanvas(src,360);return Object.assign({id:PID++,src,thumb:t.toDataURL("image/jpeg",.8),when:"",caption:"",speaker:0,bubble:""},extra||{})}
+async function addFiles(files){const list=[...files].filter(f=>f.type.startsWith("image/")).slice(0,15-ST.photos.length);if(!list.length)return toast(ST.photos.length>=15?"Maximum 15 photos.":"Ce fichier n'est pas une image.");
+ toast(`Chargement de ${list.length} photo(s)…`);for(const f of list){try{const url=URL.createObjectURL(f);const src=await loadURL(url);URL.revokeObjectURL(url);ST.photos.push(newPhoto(src))}catch(e){toast("Impossible de lire "+esc(f.name)+" (format non supporté ?)")}}markDirty();photos()}
+const SAMPLE=[[129,"Printemps 2016, Biarritz","Un banc, un coucher de soleil… et deux inconnus qui n'allaient plus se quitter.",1,"On se connaît, non ?"],
+ [318,"Été 2016, Paris","Notre premier week-end ensemble. Tom avait tout prévu… sauf la pluie.",0,"Tu es sûr que c'est par là ?"],
+ [1011,"Août 2017, Québec","Le grand voyage. Des lacs à perte de vue et pas un seul réseau.",0,"Promets-moi qu'on reviendra ici."],
+ [823,"Hiver 2018","Léa ne sortait jamais sans son appareil. Résultat : 12 000 photos.",1,"Souris ! Non, pas comme ça…"],
+ [237,"Mars 2020","Et puis Réglisse est arrivé. Le vrai chef de la maison.",1,"Qui a mangé mes chaussons ?!"],
+ [1012,"Été 2021","Les dimanches à trois, dans les hautes herbes.",0,""],
+ [1062,"Hiver 2023","Soirées plaid, chocolat chaud et séries. Réglisse adorait ça aussi.",0,""],
+ [660,"Noël 2025","Chaque Noël, la même magie. Et toujours ces étincelles dans les yeux.",1,"Je t'aime, tu sais."],
+ [815,"Aujourd'hui","Et l'histoire continue… page après page.",0,""]];
+async function loadSamples(withStory){toast("Chargement des photos d'exemple…",6000);
+ try{const imgs=await Promise.all(SAMPLE.map(s=>loadURL(`https://picsum.photos/id/${s[0]}/1200/900`)));ST.photos=imgs.map((src,k)=>newPhoto(src,withStory?{when:SAMPLE[k][1],caption:SAMPLE[k][2],speaker:SAMPLE[k][3],bubble:SAMPLE[k][4]}:{}));ST.coverIdx=0;markDirty();
+  if(withStory)Object.assign(ST.story,{type:"couple",heroes:["Léa","Tom"],tone:"tendre",occasion:"Noël",title:"Léa & Tom, notre plus belle aventure",dedicace:"Pour Tom, mon co-pilote de toujours. Joyeux Noël ! — Léa"});
+  toast("Photos d'exemple chargées ✓")}catch(e){toast("Impossible de charger les exemples (connexion internet ?)")}
+ if(!withStory&&ST.step=="photos")photos()}
+async function startDemo(){await loadSamples(true);if(ST.photos.length)go("histoire")}
+
+/* ---------- 2. Histoire ---------- */
+function histoire(){const s=ST.story,h=s.heroes;
+ $("#app").innerHTML=`<div class="wrap"><div class="page-h"><h2>✍️ Votre histoire</h2><div class="mut">Répondez à quelques questions : c'est ce qui rendra votre BD unique. Pas d'inspiration ? Le bouton ✨ propose des textes.</div></div>
+ <div class="card"><h3>Quel genre d'histoire ?</h3><div class="grid g5" style="margin-top:10px">${TYPES.map(t=>`<div class="card opt ${s.type==t.id?"on":""}" style="padding:16px" onclick="ST.story.type='${t.id}';markDirty();histoire()"><div class="big">${t.em}</div><b>${t.t}</b><div class="mut" style="font-size:14px">${t.d}</div></div>`).join("")}</div>
+  <div class="grid g2" style="margin-top:6px"><div><label>Les héros de l'histoire (prénoms)</label><div class="grid" style="grid-template-columns:1fr 1fr;gap:8px">${h.map((x,i)=>`<input value="${esc(x)}" placeholder="${["Ex. Léa","Ex. Tom","Ex. Jules","Ex. Mamie"][i]}" oninput="ST.story.heroes[${i}]=this.value;markDirty();spk()">`).join("")}</div>
+   ${h.length<4?`<button class="sm ghost" style="margin-top:8px" onclick="ST.story.heroes.push('');histoire()">+ Ajouter un héros</button>`:""}</div>
+   <div><label>Le ton</label><div class="chips">${TONES.map(t=>`<button class="${s.tone==t[0]?"on":""}" onclick="ST.story.tone='${t[0]}';markDirty();histoire()">${t[1]}</button>`).join("")}</div>
+   <label>L'occasion</label><select onchange="ST.story.occasion=this.value;markDirty()">${OCCASIONS.map(o=>`<option ${o==s.occasion?"selected":""}>${o}</option>`).join("")}</select></div></div>
+  <div class="grid g2"><div><label>Titre de la BD</label><div class="row" style="flex-wrap:nowrap"><input id="title" value="${esc(s.title)}" placeholder="${esc(fill(TITLES[s.type][0]))}" oninput="ST.story.title=this.value;markDirty()"><button class="sm" onclick="sugTitle()" title="Suggérer">✨</button></div></div>
+   <div><label>Dédicace (dernière page)</label><input value="${esc(s.dedicace)}" placeholder="Ex. Pour Tom, mon co-pilote de toujours. Joyeux Noël !" oninput="ST.story.dedicace=this.value;markDirty()"></div></div></div>
+ <div class="card" style="margin-top:18px"><div class="row" style="justify-content:space-between"><h3 style="margin:0">Photo par photo</h3><button class="sm pri" onclick="autoAll()">✨ Écrire toute l'histoire pour moi</button></div>
+  <div class="mut" style="font-size:14px;margin-top:4px">Pour chaque photo : quand, que se passe-t-il, et une réplique éventuelle (bulle). Tout est facultatif.</div>
+  ${ST.photos.map((p,i)=>`<div class="prow"><img src="${p.thumb}"><div>
+   <div class="two"><input value="${esc(p.when)}" placeholder="Quand / où ? Ex. Été 2019, Biarritz" oninput="ST.photos[${i}].when=this.value;markDirty()"><input id="cap${i}" value="${esc(p.caption)}" placeholder="Que se passe-t-il ? Ex. Notre premier rendez-vous…" oninput="ST.photos[${i}].caption=this.value;markDirty()"></div>
+   <div class="two2" style="margin-top:8px"><select class="spk" data-i="${i}" onchange="ST.photos[${i}].speaker=+this.value;markDirty()"></select><input id="bub${i}" value="${esc(p.bubble)}" placeholder="💬 Une réplique ? Ex. Tu es sûr que c'est par là ?" oninput="ST.photos[${i}].bubble=this.value;markDirty()"><button class="sm" onclick="sug(${i})" title="Suggérer">✨</button></div></div></div>`).join("")}
+  <div class="note" style="margin-top:12px">💡 Dans la version commerciale, une IA d'écriture rédige l'histoire complète à partir de vos réponses et vous propose plusieurs versions. Ici, la démo pioche dans une bibliothèque de textes.</div></div>
+ </div>${navbar("photos","style","Choisir le style")}`;spk()}
+function spk(){const h=heroes();document.querySelectorAll(".spk").forEach(s=>{const i=+s.dataset.i;s.innerHTML=h.map((x,k)=>`<option value="${k}" ${ST.photos[i].speaker==k?"selected":""}>💬 ${esc(x)} dit :</option>`).join("")})}
+function pick(a,r){return a[Math.floor(r*a.length)]}
+function sug(i){const s=ST.story,n=ST.photos.length,ph=i==0?"debut":i==n-1?"fin":"milieu",p=ST.photos[i];p.caption=fill(pick(CAPS[s.type][ph],Math.random()));p.bubble=Math.random()<.75?pick(BUBS[s.tone],Math.random()):"";p.speaker=Math.floor(Math.random()*heroes().length);
+ $("#cap"+i).value=p.caption;$("#bub"+i).value=p.bubble;spk();markDirty()}
+function autoAll(){const s=ST.story,n=ST.photos.length;const used=new Set();ST.photos.forEach((p,i)=>{const ph=i==0?"debut":i==n-1?"fin":"milieu";if(!p.caption){let c,g=0;do{c=fill(pick(CAPS[s.type][ph],Math.random()))}while(used.has(c)&&g++<20);used.add(c);p.caption=c}
+ if(!p.bubble&&i%2==0&&i<n-1){p.bubble=pick(BUBS[s.tone],Math.random());p.speaker=i/2%heroes().length}});if(!s.title)s.title=fill(TITLES[s.type][0]);if(!s.dedicace)s.dedicace="Joyeux "+s.occasion.toLowerCase().replace(/^(fête|saint)/,m=>m)+" ! Avec tout notre amour.";markDirty();histoire();toast("Histoire écrite ✨ Modifiez ce que vous voulez !")}
+function sugTitle(){const t=TITLES[ST.story.type];ST.story.title=fill(t[(t.indexOf(ST.story._t||"")+1)%t.length]);ST.story._t=t[(t.indexOf(ST.story._t||"")+1)%t.length];$("#title").value=ST.story.title;markDirty()}
+
+/* ---------- 3. Style ---------- */
+function styleStep(){$("#app").innerHTML=`<div class="wrap"><div class="page-h"><h2>🎨 Le style graphique</h2><div class="mut">Vos photos sont redessinées dans le style choisi. Aperçu en direct sur votre photo de couverture.</div></div>
+ <div class="grid g5">${STYLES.map(s=>`<div class="card opt stylecard ${ST.style==s.id?"on":""}" style="padding:12px" onclick="ST.style='${s.id}';markDirty();styleStep()"><canvas id="sv-${s.id}" width="400" height="300"></canvas><h3>${s.em} ${s.t}</h3><div class="mut" style="font-size:14px">${s.d}</div></div>`).join("")}</div>
+ <div class="card" style="margin-top:18px"><h3>Aperçu en grand : ${STYLES.find(s=>s.id==ST.style).t}</h3><div class="grid g2" id="bigprev"></div></div>
+ <div class="note" style="margin-top:14px">💡 Dans cette démo, le dessin est fait <b>en direct dans votre navigateur</b> (effets de rendu BD). La version commerciale utilisera en plus une IA de génération d'images, qui redessine entièrement chaque case dans le style choisi en gardant la ressemblance des visages.</div>
+ </div>${navbar("histoire","longueur","Choisir la longueur")}`;
+ const ph=ST.photos[ST.coverIdx]||ST.photos[0];if(!ph)return;
+ STYLES.forEach((s,k)=>setTimeout(()=>{const c=$("#sv-"+s.id);if(c)c.getContext("2d").drawImage(stylize(ph,s.id,400,300,1,.5,.45),0,0)},30+k*40));
+ setTimeout(()=>{const b=$("#bigprev");if(!b)return;[ST.photos[1]||ph,ST.photos[2]||ph].forEach(p=>{const c=stylize(p,ST.style,640,480,1,.5,.45);const im=document.createElement("img");im.src=c.toDataURL("image/jpeg",.9);im.style.cssText="width:100%;border-radius:12px";b.appendChild(im)})},260)}
+
+/* ---------- 4. Longueur ---------- */
+function longueur(){const n=ST.photos.length,reco=n<=6?"courte":n<=10?"classique":"album";
+ $("#app").innerHTML=`<div class="wrap"><div class="page-h"><h2>📏 La longueur de la BD</h2><div class="mut">Avec ${n} photos, nous recommandons le format <b>${LENGTHS.find(l=>l.id==reco).t}</b>. Plus la BD est longue, plus nous ajoutons de gros plans, d'ellipses et de cases de transition.</div></div>
+ <div class="grid g5">${LENGTHS.map(l=>`<div class="card opt ${ST.length==l.id?"on":""}" onclick="ST.length='${l.id}';markDirty();longueur()"><div class="big">${"📄".repeat(Math.min(4,l.pages/4))}</div><h3>${l.t}</h3><div>${l.d}</div><div class="mut" style="margin-top:6px">≈ ${l.read} de lecture · couverture incluse</div><div style="margin-top:10px;font-weight:700">${l.add?"+ "+l.add+" €":"Prix de base"}</div>${l.id==reco?`<div class="pill" style="margin-top:8px;background:#e9f4ee;color:var(--green)">Recommandé</div>`:""}</div>`).join("")}</div>
+ </div>${navbar("style","apercu","Voir ma BD")}`}
+
+/* ---------- 5. Aperçu ---------- */
+function apercu(){$("#app").innerHTML=`<div class="wrap"><div class="page-h row" style="justify-content:space-between"><div><h2>📖 Votre BD</h2><div class="mut">${esc(fill(ST.story.title||TITLES[ST.story.type][0]))} · ${STYLES.find(s=>s.id==ST.style).t} · ${LENGTHS.find(l=>l.id==ST.length).pages} planches</div></div>
+ <div class="row"><button class="sm ghost" onclick="ST.seed++;markDirty();apercu()">🎲 Autre mise en page</button><button class="sm ghost" onclick="go('histoire')">✏️ Textes</button><button class="sm ghost" onclick="go('style')">🎨 Style</button></div></div>
+ <div class="viewer"><div class="pagebox" id="pbox"></div><div class="tstrip" id="tstrip"></div></div>
+ </div>${navbar("longueur","commande","Commander / offrir")}`;
+ if(ST.dirty||!ST.pages.length){ST.pageIdx=0;renderAll()}drawViewer()}
+function drawViewer(){const b=$("#pbox");if(!b)return;const total=LENGTHS.find(l=>l.id==ST.length).pages+1,i=ST.pageIdx,src=ST.pages[i];
+ b.innerHTML=src?`<img src="${src}" alt="planche"><div class="row"><button onclick="flip(-1)" ${i==0?"disabled":""}>←</button><span>${i==0?"Couverture":"Planche "+i} · ${i+1}/${total}</span><button onclick="flip(1)" ${i>=total-1?"disabled":""}>→</button><button class="sm" onclick="dlPage()">⬇️ PNG</button></div>`
+ :`<div style="height:60vh;display:grid;place-items:center;text-align:center;color:#fff"><div><div style="font-size:50px">✏️</div><div id="progt" style="margin:10px 0">Nos dessinateurs s'activent…</div><div class="progress" id="prog" style="margin:auto"><i></i></div></div></div>`;
+ if(ST.rendering&&src)b.insertAdjacentHTML("beforeend",`<div style="color:#fff;font-size:14px;width:100%;display:flex;flex-direction:column;align-items:center;gap:6px"><span id="progt"></span><div class="progress" id="prog"><i style="width:${Math.round(100*ST.pages.length/total)}%"></i></div></div>`);
+ $("#tstrip").innerHTML=Array.from({length:total},(_,k)=>ST.pages[k]?`<img src="${ST.pages[k]}" class="${k==i?"on":""}" onclick="ST.pageIdx=${k};drawViewer()">`:`<div style="aspect-ratio:1240/1754;background:#e8dfd2;border-radius:4px"></div>`).join("")}
+function flip(d){const total=LENGTHS.find(l=>l.id==ST.length).pages+1;ST.pageIdx=Math.max(0,Math.min(total-1,ST.pageIdx+d));drawViewer()}
+document.addEventListener("keydown",e=>{if(ST.step!="apercu")return;if(e.key=="ArrowRight")flip(1);if(e.key=="ArrowLeft")flip(-1)});
+function dlPage(){const a=document.createElement("a");a.href=ST.pages[ST.pageIdx];a.download=`ma-bd-${ST.pageIdx==0?"couverture":"planche-"+ST.pageIdx}.jpg`;a.click()}
+async function dlPDF(){if(ST.dirty||ST.pages.length<LENGTHS.find(l=>l.id==ST.length).pages+1){toast("Préparation de la BD…");await renderAll()}
+ if(!window.jspdf)return toast("Le module PDF n'a pas pu se charger (connexion ?). Téléchargez les planches une par une depuis l'aperçu.");
+ const doc=new window.jspdf.jsPDF({unit:"px",format:[PW,PH],hotfixes:["px_scaling"]});ST.pages.forEach((p,k)=>{if(k)doc.addPage([PW,PH]);doc.addImage(p,"JPEG",0,0,PW,PH)});doc.save("ma-bd-il-etait-une-fois.pdf")}
+
+/* ---------- 6. Commande ---------- */
+function price(){const o=ST.order,f=FORMATS.find(x=>x.id==o.format),L=LENGTHS.find(l=>l.id==ST.length),isPrint=f.id!="pdf";
+ const unit=f.p+L.add*(isPrint?1:.5),lines=[[`${f.t} · ${L.t}`,unit]];if(o.qty>1)lines.push([`${o.qty-1} exemplaire(s) en plus (−40 %)`,(o.qty-1)*unit*.6]);
+ EXTRAS.forEach(e=>{if(o.extras[e.id]&&(!e.print||isPrint)&&e.notIn!=f.id)lines.push([e.t.replace(/^\S+ /,""),e.p*(e.id=="mug"?o.qty:1)])});
+ if(isPrint){const s=SHIPPING.find(x=>x.id==o.ship);lines.push(["Livraison "+s.t.split(" ")[0].toLowerCase(),s.p])}
+ return{lines,total:lines.reduce((a,l)=>a+l[1],0),isPrint}}
+function delivery(){const o=ST.order,s=SHIPPING.find(x=>x.id==o.ship),d=new Date();let n=2+s.days;while(n>0){d.setDate(d.getDate()+1);if(d.getDay()%6)n--}return d}
+function commande(){const o=ST.order,f=FORMATS.find(x=>x.id==o.format),pr=price(),dl=delivery(),x=new Date(new Date().getFullYear(),11,24),ok=dl<=x;
+ $("#app").innerHTML=`<div class="wrap"><div class="page-h"><h2>🎁 Impression & cadeau</h2><div class="mut">Choisissez comment offrir votre BD.</div></div>
+ <div class="shop"><div>
+  <div class="grid g2">${FORMATS.map(x=>`<div class="card opt ${o.format==x.id?"on":""}" onclick="ST.order.format='${x.id}';commande()"><div class="row" style="justify-content:space-between"><div class="big">${x.em}</div>${x.best?`<span class="pill" style="background:var(--gold);color:#fff">Le plus offert</span>`:""}</div><h3 style="margin-top:6px">${x.t}</h3><div class="mut" style="font-size:14px">${x.d}</div><div style="margin-top:8px;font-weight:800;font-size:20px">${eur(x.p+LENGTHS.find(l=>l.id==ST.length).add*(x.id=="pdf"?.5:1))}</div></div>`).join("")}</div>
+  ${pr.isPrint?`<h3 style="margin-top:24px">Options</h3>
+   ${EXTRAS.filter(e=>e.notIn!=o.format).map(e=>`<label class="check ${o.extras[e.id]?"on":""}"><input type="checkbox" ${o.extras[e.id]?"checked":""} onchange="ST.order.extras['${e.id}']=this.checked;commande()"><div><b>${e.t}</b><div class="mut" style="font-size:14px;font-weight:400">${e.d}</div></div><span class="pr">+ ${eur(e.p)}</span></label>`).join("")}
+   <div class="grid g2" style="margin-top:6px"><div><label>Nombre d'exemplaires</label><div class="row" style="flex-wrap:nowrap"><button class="sm" onclick="ST.order.qty=Math.max(1,ST.order.qty-1);commande()">−</button><b style="min-width:30px;text-align:center">${o.qty}</b><button class="sm" onclick="ST.order.qty=Math.min(10,ST.order.qty+1);commande()">+</button><span class="mut" style="font-size:13px">−40 % dès le 2ᵉ (pour les grands-parents !)</span></div></div>
+   <div><label>Livraison</label><select onchange="ST.order.ship=this.value;commande()">${SHIPPING.map(s=>`<option value="${s.id}" ${o.ship==s.id?"selected":""}>${s.t} · ${eur(s.p)}</option>`).join("")}</select></div></div>`
+   :`<div class="note" style="margin-top:18px">📱 Le PDF HD est livré immédiatement par e-mail, avec un lien de partage pour toute la famille.</div>`}
+ </div>
+ <div class="summary card"><div class="book3d"><div class="b" style="background-image:url(${ST.pages[0]||""})"></div></div>
+  ${pr.isPrint?`<div class="deadline">${ok?"🎄 Livré avant Noël":"⚠️ Livraison après Noël"} · estimé le ${dl.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})}${!ok&&o.ship=="std"?" — choisissez l'express !":""}</div>`:`<div class="deadline">⚡ Livraison immédiate par e-mail</div>`}
+  ${pr.lines.map(l=>`<div class="l"><span>${esc(l[0])}</span><b>${eur(l[1])}</b></div>`).join("")}<div class="l tot"><span>Total</span><span>${eur(pr.total)}</span></div>
+  <button class="pri" style="width:100%;margin-top:14px;font-size:17px" onclick="checkout()">Commander · ${eur(pr.total)}</button>
+  <div class="mut" style="font-size:13px;text-align:center;margin-top:8px">🔒 Paiement sécurisé · Satisfait ou réimprimé</div></div></div>
+ </div>${navbar("apercu","commande","")}`;$(".navbar #nextBtn").style.visibility="hidden";if(!ST.pages.length&&!ST.rendering)renderAll().then(()=>ST.step=="commande"&&commande())}
+function checkout(){const pr=price(),m=document.createElement("div");m.className="modal";m.onclick=e=>{if(e.target==m)m.remove()};
+ m.innerHTML=`<div class="card"><h2>Finaliser la commande</h2><div class="note">🧪 Site de démonstration : aucun paiement réel ne sera effectué.</div>
+ <label>Prénom et nom</label><input id="ck-n" placeholder="Léa Martin">${pr.isPrint?`<label>Adresse de livraison</label><textarea id="ck-a" placeholder="12 rue des Lilas, 75011 Paris"></textarea>`:""}
+ <label>E-mail</label><input id="ck-e" type="email" placeholder="lea@exemple.fr"><label>Carte bancaire</label><input placeholder="4242 4242 4242 4242 · 12/28 · 123">
+ <div class="row" style="margin-top:16px;justify-content:space-between"><button class="ghost" onclick="this.closest('.modal').remove()">Annuler</button><button class="pri" onclick="this.closest('.modal').remove();go('merci')">Payer ${eur(pr.total)}</button></div></div>`;document.body.appendChild(m)}
+function merci(){const no="BD-"+Math.random().toString(36).slice(2,8).toUpperCase(),pr=price();
+ $("#app").innerHTML=`<div class="wrap" style="max-width:720px;text-align:center;padding-top:40px"><div style="font-size:64px">🎉</div><h1>Merci !</h1><p class="lead mut">Votre commande <b>${no}</b> est confirmée (démo).</p>
+ <div class="book3d"><div class="b" style="background-image:url(${ST.pages[0]||""});width:240px"></div></div>
+ <div class="card" style="text-align:left">${pr.isPrint?`<p>📦 Votre album part à l'impression dans les 48 h. Livraison estimée : <b>${delivery().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})}</b>.</p>`:""}
+ <p>📱 Votre BD numérique est prête :</p><button class="pri" onclick="dlPDF()">⬇️ Télécharger ma BD (PDF)</button></div>
+ <div class="row" style="justify-content:center;margin-top:20px"><button class="ghost" onclick="go('apercu')">Revoir ma BD</button><button class="ghost" onclick="ST.photos=[];ST.pages=[];ST.dirty=true;ST.story={type:'couple',heroes:['',''],tone:'tendre',occasion:'Noël',title:'',dedicace:''};go('home')">Créer une autre BD</button></div></div>`;
+ setTimeout(confettiX,100)}
+function confettiX(){for(let i=0;i<40;i++){const s=document.createElement("div");s.textContent=["🎄","⭐","🎁","💖","✨"][i%5];s.style.cssText=`position:fixed;top:-40px;left:${Math.random()*100}vw;font-size:28px;z-index:99;transition:transform 2.6s linear,opacity 2.6s;pointer-events:none`;document.body.appendChild(s);requestAnimationFrame(()=>{s.style.transform=`translateY(110vh) rotate(${Math.random()*720}deg)`;s.style.opacity=".3"});setTimeout(()=>s.remove(),2800)}}
+
+go("home");
+</script>
+</body>
+</html>
